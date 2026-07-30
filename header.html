@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dashboard Header</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500&family=IBM+Plex+Mono:wght@400;500&display=swap');
+
+  :root{
+    --bg: #0A0D10;
+    --panel: #10151A;
+    --hairline: #1D242B;
+    --text: #E9EDEF;
+    --muted: #7A8590;
+    --accent: #3ED9A0;
+    --accent-dim: #1F6E4F;
+    --warn: #E8B339;
+  }
+
+  *{ box-sizing:border-box; margin:0; padding:0; }
+
+  html, body{
+    width:100%; height:100%;
+    background:var(--bg);
+    font-family:'Inter', sans-serif;
+    overflow:hidden;
+  }
+
+  .bar{
+    position:relative;
+    width:100%; height:100%;
+    min-height:72px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:24px;
+    padding:0 26px;
+    background:linear-gradient(180deg, var(--panel) 0%, var(--bg) 100%);
+    border-bottom:1px solid var(--hairline);
+  }
+
+  .pulse-trace{
+    position:absolute; inset:0;
+    pointer-events:none;
+    opacity:0.20;
+  }
+  .pulse-trace svg{ width:100%; height:100%; }
+  .pulse-trace path{
+    fill:none;
+    stroke:var(--accent);
+    stroke-width:1.25;
+    stroke-dasharray:6 900;
+    animation: trace 5.5s linear infinite;
+  }
+  @keyframes trace{
+    0%{ stroke-dashoffset:900; }
+    100%{ stroke-dashoffset:0; }
+  }
+
+  .left{ display:flex; align-items:center; gap:16px; min-width:0; z-index:1; }
+
+  .status{ display:flex; align-items:center; gap:8px; flex-shrink:0; }
+  .dot{
+    width:8px; height:8px; border-radius:50%;
+    background:var(--accent);
+    animation: ping 2.2s ease-out infinite;
+  }
+  .dot.stale{ background:var(--warn); animation:none; }
+  @keyframes ping{
+    0%{ box-shadow:0 0 0 0 rgba(62,217,160,0.55); }
+    70%{ box-shadow:0 0 0 8px rgba(62,217,160,0); }
+    100%{ box-shadow:0 0 0 0 rgba(62,217,160,0); }
+  }
+  .status-label{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:10px; letter-spacing:0.14em;
+    color:var(--accent); text-transform:uppercase; flex-shrink:0;
+  }
+  .status-label.stale{ color:var(--warn); }
+
+  .divider{ width:1px; height:34px; background:var(--hairline); flex-shrink:0; }
+
+  .titles{ min-width:0; display:flex; flex-direction:column; gap:2px; }
+  .title{
+    font-family:'Space Grotesk', sans-serif;
+    font-weight:600; font-size:16px; color:var(--text);
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  }
+  .desc{
+    font-size:12.5px; color:var(--muted);
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  }
+
+  .right{ display:flex; align-items:center; gap:22px; flex-shrink:0; z-index:1; }
+
+  .meta{ display:flex; flex-direction:column; align-items:flex-end; gap:2px; }
+  .meta-label{
+    font-size:10px; letter-spacing:0.1em;
+    text-transform:uppercase; color:var(--muted);
+  }
+  .meta-value{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:13px; color:var(--text);
+  }
+
+  .contact{
+    display:flex; align-items:center; gap:10px;
+    background:rgba(62,217,160,0.06);
+    border:1px solid var(--accent-dim);
+    padding:6px 12px; border-radius:999px;
+  }
+  .contact-icon{
+    width:20px; height:20px; border-radius:50%;
+    background:var(--accent); color:#06110C;
+    font-family:'Space Grotesk', sans-serif;
+    font-weight:700; font-size:10px;
+    display:flex; align-items:center; justify-content:center; flex-shrink:0;
+  }
+  .contact-text{ font-size:12px; color:var(--text); white-space:nowrap; }
+  .contact-text a{
+    color:var(--text); text-decoration:none;
+    border-bottom:1px solid var(--accent-dim);
+  }
+  .contact-text a:hover{ border-bottom-color:var(--accent); }
+
+  @media (max-width: 820px){
+    .desc{ display:none; }
+    .divider{ display:none; }
+  }
+  @media (max-width: 620px){
+    .contact-text{ display:none; }
+    .contact{ padding:6px; }
+  }
+  @media (prefers-reduced-motion: reduce){
+    .pulse-trace path, .dot{ animation:none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="bar">
+  <div class="pulse-trace">
+    <svg viewBox="0 0 1000 76" preserveAspectRatio="none">
+      <path d="M0,38 L120,38 L135,15 L150,60 L165,38 L1000,38" />
+    </svg>
+  </div>
+
+  <div class="left">
+    <div class="status">
+      <span class="dot" id="dot"></span>
+      <span class="status-label" id="status-label">Live</span>
+    </div>
+    <div class="divider"></div>
+    <div class="titles">
+      <div class="title" id="title">Dashboard</div>
+      <div class="desc" id="desc"></div>
+    </div>
+  </div>
+
+  <div class="right">
+    <div class="meta">
+      <span class="meta-label">Last refreshed</span>
+      <span class="meta-value" id="timestamp">—</span>
+    </div>
+    <div class="contact">
+      <span class="contact-icon" id="contact-initial">?</span>
+      <span class="contact-text" id="contact-text">Contact the data team</span>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  var params = new URLSearchParams(window.location.search);
+
+  // ---------- helpers ----------
+
+  // Turn "Cumulative_Daily_Rank" or "cumulative-daily-rank" into "Cumulative Daily Rank".
+  // Lets your Sigma column hold URL-safe values so no encoding formula is needed.
+  function prettify(s){
+    if (!s) return '';
+    var out = s.replace(/[_+\-]+/g, ' ').replace(/\s+/g, ' ').trim();
+    return out.replace(/\b\w/g, function(c){ return c.toUpperCase(); });
+  }
+
+  // Accepts several timestamp shapes so you don't have to fight Sigma's Text() formatting:
+  //   20260730-154500   (compact, URL-safe — recommended)
+  //   2026-07-30T15:45:00
+  //   2026-07-30 15:45:00
+  //   1753891500000     (epoch millis)
+  function parseTs(raw){
+    if (!raw) return null;
+    var s = String(raw).trim();
+
+    var m = s.match(/^(\d{4})(\d{2})(\d{2})[-_ T]?(\d{2})(\d{2})(\d{2})?$/);
+    if (m){
+      return new Date(+m[1], +m[2]-1, +m[3], +m[4], +m[5], +(m[6]||0));
+    }
+
+    if (/^\d{10,13}$/.test(s)){
+      var n = +s;
+      return new Date(s.length <= 10 ? n * 1000 : n);
+    }
+
+    var d = new Date(s.replace(' ', 'T'));
+    return isNaN(d) ? null : d;
+  }
+
+  function fmt(d){
+    return d.toLocaleString('en-US', {
+      month:'short', day:'numeric',
+      hour:'numeric', minute:'2-digit',
+      hour12:true
+    });
+  }
+
+  function setText(id, value){
+    var el = document.getElementById(id);
+    if (el) el.textContent = value;
+  }
+
+  // ---------- title & description ----------
+
+  var rawTitle = params.get('title');
+  setText('title', rawTitle ? prettify(rawTitle) : 'Dashboard');
+
+  var rawDesc = params.get('desc');
+  if (rawDesc){
+    setText('desc', rawDesc.replace(/[_+]+/g, ' ').replace(/\s+/g, ' ').trim());
+  } else {
+    var descEl = document.getElementById('desc');
+    if (descEl) descEl.style.display = 'none';
+  }
+
+  // ---------- contact ----------
+
+  var contact = params.get('contact');
+  var contactLink = params.get('contact_link');
+  if (contact){
+    var name = prettify(contact);
+    setText('contact-initial', name.charAt(0).toUpperCase() || '?');
+    var textEl = document.getElementById('contact-text');
+    if (contactLink){
+      var a = document.createElement('a');
+      a.href = contactLink;
+      a.target = '_blank';
+      a.rel = 'noopener';
+      a.textContent = name;
+      textEl.textContent = 'Questions \u2192 ';
+      textEl.appendChild(a);
+    } else {
+      textEl.textContent = 'Questions \u2192 ' + name;
+    }
+  }
+
+  // ---------- last refreshed ----------
+
+  var ts = parseTs(params.get('refreshed_at'));
+
+  if (ts){
+    setText('timestamp', fmt(ts));
+
+    var maxAgeHours = parseFloat(params.get('stale_after_hours') || '24');
+    var ageHours = (Date.now() - ts.getTime()) / 36e5;
+    if (isFinite(maxAgeHours) && ageHours > maxAgeHours){
+      document.getElementById('dot').classList.add('stale');
+      var lbl = document.getElementById('status-label');
+      lbl.classList.add('stale');
+      lbl.textContent = 'Stale';
+    }
+  } else {
+    setText('timestamp', fmt(new Date()));
+    var label = document.querySelector('.meta-label');
+    if (label) label.textContent = 'Page loaded';
+  }
+})();
+</script>
+
+</body>
+</html>
